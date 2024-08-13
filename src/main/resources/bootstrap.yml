@@ -1,5 +1,9 @@
-server:
+app:
   port: 8761
+  logging: debug
+
+server:
+  port: ${app.port}
 
 spring:
   application:
@@ -16,4 +20,8 @@ eureka:
 
 logging:
   level:
-    web: debug
+    eterea.eureka.service: ${app.logging}
+    web: ${app.logging}
+    org:
+      springframework.cloud.config: ${app.logging}
+      
