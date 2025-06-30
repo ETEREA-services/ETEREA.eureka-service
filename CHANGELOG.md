@@ -7,11 +7,15 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.0.h
 
 ## [Unreleased]
 
+## [0.1.0] - 2025-06-30
+
 ### Added
 - Soporte para Java 24
 - Integración de Spring Boot Validation
 - Implementación de Caffeine Cache para optimización del LoadBalancer
 - Documentación técnica mejorada con GitHub Pages
+- feat(docs): implementa documentación automática y mejora CI/CD
+- feat: upgrade to Java 24 and add validation dependencies
 
 ### Changed
 - Actualización de Spring Boot a 3.4.5
@@ -43,6 +47,7 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.0.h
 - Integración con GitHub Actions para CI/CD
 - Configuración inicial de Docker
 
-[Unreleased]: https://github.com/eterea/eureka-service/compare/v0.0.1...HEAD
+[Unreleased]: https://github.com/eterea/eureka-service/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/eterea/eureka-service/compare/v0.0.1...v0.1.0
 [0.0.1]: https://github.com/eterea/eureka-service/compare/v0.0.0...v0.0.1
 [0.0.0]: https://github.com/eterea/eureka-service/releases/tag/v0.0.0 
