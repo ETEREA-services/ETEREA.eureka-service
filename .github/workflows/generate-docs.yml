@@ -22,6 +22,16 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Set up JDK 24
+        uses: actions/setup-java@v4
+        with:
+          java-version: '24'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Generate Dependency Tree
+        run: mvn dependency:tree -DoutputFile=docs/dependency-tree.txt
+
       - name: Generate Project Documentation
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -64,6 +74,11 @@ jobs:
               </div>
               <div id="stats" class="stats"></div>
               <div id="architecture" class="section"></div>
+              <div id="dependencies" class="section">
+                  <h2>🌳 Grafo de Dependencias</h2>
+                  <p>El siguiente fichero contiene el árbol de dependencias completo del proyecto, generado por Maven.</p>
+                  <p><a href="dependency-tree.txt" target="_blank">Ver dependency-tree.txt</a></p>
+              </div>
               <div id="milestones" class="section"></div>
               <div id="pull-requests" class="section"></div>
               
