@@ -225,7 +225,7 @@ jobs:
 
           Toda la **documentación detallada, interactiva y actualizada** se encuentra en nuestro sitio de **GitHub Pages**.
 
-          ## ➡️ [Acceder a la Documentación Principal](https://eterea.github.io/eureka-service/)
+          ## ➡️ [Acceder a la Documentación Principal](https://$(echo ${{ github.repository_owner }} | tr '[:upper:]' '[:lower:]').github.io/$(echo ${{ github.repository }} | cut -d'/' -f2)/)
 
           ---
 
