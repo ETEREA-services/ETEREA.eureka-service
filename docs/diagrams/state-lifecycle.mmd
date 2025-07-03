@@ -1,0 +1,9 @@
+stateDiagram-v2
+    [*] --> STARTING: Al arrancar
+    STARTING --> UP: Registro exitoso
+    UP --> UP: Heartbeat recibido
+    UP --> DOWN: Heartbeat perdido (timeout)
+    DOWN --> UP: Heartbeat recuperado
+    UP --> OUT_OF_SERVICE: Des-registro manual
+    OUT_OF_SERVICE --> [*]: Eliminado
+    DOWN --> [*]: Eliminado por inactividad
