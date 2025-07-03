@@ -208,16 +208,16 @@ jobs:
           jq -r '.[] | "- **[" + .title + "](" + .html_url + ")**"' ../milestones.json >> Home.md
 
           # --- Project Status Page ---
-          cat > Project-Status.md << 'EOF'
+          cat > "Estado-del-Proyecto.md" << 'EOF'
           # Estado del Proyecto
           ## Resumen de Issues
           EOF
-          echo "### Issues por Estado" >> Project-Status.md
-          echo "- **Total:** $(jq '. | length' ../issues.json)" >> Project-Status.md
-          echo "- **Abiertos:** $(jq '[.[] | select(.state=="open")] | length' ../issues.json)" >> Project-Status.md
-          echo "- **Cerrados:** $(jq '[.[] | select(.state=="closed")] | length' ../issues.json)" >> Project-Status.md
-          echo -e "\n### Issues por Etiqueta\n" >> Project-Status.md
-          jq -r '[.[] | .labels[] | {name: .name, color: .color}] | group_by(.name) | map({label: .[0].name, color: .[0].color, count: length}) | .[] | "- <span style=\"background-color: #" + .color + "; color: black; padding: 2px 5px; border-radius: 3px;\">" + .label + "</span>: **" + (.count | tostring) + "**"' ../issues.json >> Project-Status.md || echo "No hay etiquetas"
+          echo "### Issues por Estado" >> "Estado-del-Proyecto.md"
+          echo "- **Total:** $(jq '. | length' ../issues.json)" >> "Estado-del-Proyecto.md"
+          echo "- **Abiertos:** $(jq '[.[] | select(.state=="open")] | length' ../issues.json)" >> "Estado-del-Proyecto.md"
+          echo "- **Cerrados:** $(jq '[.[] | select(.state=="closed")] | length' ../issues.json)" >> "Estado-del-Proyecto.md"
+          echo -e "\n### Issues por Etiqueta\n" >> "Estado-del-Proyecto.md"
+          jq -r '[.[] | .labels[] | {name: .name, color: .color}] | group_by(.name) | map({label: .[0].name, color: .[0].color, count: length}) | .[] | "- <span style=\"background-color: #" + .color + "; color: black; padding: 2px 5px; border-radius: 3px;\">" + .label + "</span>: **" + (.count | tostring) + "**"' ../issues.json >> "Estado-del-Proyecto.md" || echo "No hay etiquetas"
 
           # --- Pull Requests Page ---
           cat > Pull-Requests.md << 'EOF'
