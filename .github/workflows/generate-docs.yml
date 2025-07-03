@@ -177,7 +177,7 @@ jobs:
           git commit -m "Update wiki documentation from PR #${{ github.event.pull_request.number || 'direct-push' }}" || echo "No changes to commit"
           
           if [[ "${{ github.event.pull_request.head.repo.full_name }}" == "${{ github.repository }}" ]] || [[ "${{ github.event_name }}" == "push" ]]; then
-            git push --set-upstream https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.wiki.git main
+            git push --set-upstream https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.wiki.git master
           fi
 
       - name: Upload artifacts
