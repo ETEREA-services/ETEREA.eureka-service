@@ -3,7 +3,7 @@ import json
 import yaml
 from jinja2 import Environment, FileSystemLoader
 
-def load_data(data_dir='data'):
+def load_data(data_dir='../data'):
     """Carga los datos de issues, milestones y releases desde archivos JSON."""
     # Crear directorio de datos si no existe y ficheros dummy
     if not os.path.exists(data_dir):
@@ -26,12 +26,12 @@ def load_data(data_dir='data'):
         releases = json.load(f)
     return issues, milestones, releases
 
-def load_config(config_file='src/main/resources/bootstrap.yml'):
+def load_config(config_file='../src/main/resources/bootstrap.yml'):
     """Carga la configuración de la aplicación desde un archivo YAML."""
     with open(config_file, 'r') as f:
         return yaml.safe_load(f)
 
-def generate_docs(output_dir='docs'):
+def generate_docs(output_dir='../docs'):
     """Genera la documentación del proyecto en el directorio de salida."""
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
