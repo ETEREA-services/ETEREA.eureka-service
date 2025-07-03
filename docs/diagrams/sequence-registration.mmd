@@ -1,0 +1,14 @@
+sequenceDiagram
+    participant UserSvc as Servicio de Usuarios
+    participant EurekaSvc as Eterea Eureka
+    participant Gateway as API Gateway
+
+    UserSvc->>+EurekaSvc: 1. Petición de Registro (REGISTER)
+    EurekaSvc-->>-UserSvc: 2. Registro Exitoso (200 OK)
+
+    loop Heartbeats
+        UserSvc->>EurekaSvc: 3. Envío de Heartbeat periódico
+    end
+
+    Gateway->>+EurekaSvc: 4. Petición de Registro de Servicios (FETCH)
+    EurekaSvc-->>-Gateway: 5. Devuelve lista de servicios (incluye UserSvc)

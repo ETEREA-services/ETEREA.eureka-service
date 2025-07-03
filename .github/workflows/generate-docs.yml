@@ -75,6 +75,8 @@ jobs:
               </div>
               <div id="stats" class="stats"></div>
               <div id="architecture" class="section"></div>
+              <div id="sequence-diagram" class="section"></div>
+              <div id="state-diagram" class="section"></div>
               <div id="dependencies" class="section">
                   <h2>🌳 Grafo de Dependencias</h2>
                   <p>El siguiente es el árbol de dependencias completo del proyecto, generado por Maven.</p>
@@ -137,6 +139,24 @@ jobs:
                   </div>
               `;
               document.getElementById('architecture').innerHTML = architectureHTML;
+
+              // --- Sequence Diagram ---
+              fetch('diagrams/sequence-registration.mmd')
+                  .then(response => response.text())
+                  .then(data => {
+                      const sequenceContainer = document.getElementById('sequence-diagram');
+                      sequenceContainer.innerHTML = '<h2>🔄 Diagrama de Secuencia: Registro de Servicio</h2><div class="mermaid">' + data + '</div>';
+                      mermaid.init(undefined, sequenceContainer.querySelector('.mermaid'));
+                  });
+
+              // --- State Diagram ---
+              fetch('diagrams/state-lifecycle.mmd')
+                  .then(response => response.text())
+                  .then(data => {
+                      const stateContainer = document.getElementById('state-diagram');
+                      stateContainer.innerHTML = '<h2>🚦 Diagrama de Estado: Ciclo de Vida del Servicio</h2><div class="mermaid">' + data + '</div>';
+                      mermaid.init(undefined, stateContainer.querySelector('.mermaid'));
+                  });
           
               // --- Milestones ---
               let milestonesHTML = '<h2>🎯 Milestones</h2>';
