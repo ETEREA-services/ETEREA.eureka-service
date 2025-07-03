@@ -34,6 +34,16 @@ def fetch_github_data():
             'due_on': milestone.due_on.isoformat() if milestone.due_on else None
         }
         milestones_data.append(milestone_data)
+
+    # Obtener releases
+    releases_data = []
+    for release in repo.get_releases():
+        releases_data.append({
+            'tag_name': release.tag_name,
+            'name': release.title,
+            'body': release.body or '',
+            'published_at': release.published_at.isoformat() if release.published_at else None,
+        })
     
     # Guardar datos
     os.makedirs('data', exist_ok=True)
@@ -41,6 +51,8 @@ def fetch_github_data():
         json.dump(issues_data, f, indent=2)
     with open('data/milestones.json', 'w') as f:
         json.dump(milestones_data, f, indent=2)
+    with open('data/releases.json', 'w') as f:
+        json.dump(releases_data, f, indent=2)
 
 if __name__ == '__main__':
     fetch_github_data() 

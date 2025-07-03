@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.termascacheuta</groupId>
     <artifactId>eureka-service</artifactId>
-    <version>0.1.0</version>
+    <version>0.2.0</version>
     <name>eterea.eureka-service</name>
     <description>eterea.eureka-service</description>
     <properties>
@@ -71,6 +71,27 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.2.0</version>
+                <executions>
+                    <execution>
+                        <id>generate-docs</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>python</executable>
+                            <workingDirectory>${project.basedir}/scripts</workingDirectory>
+                            <arguments>
+                                <argument>generate_docs.py</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
