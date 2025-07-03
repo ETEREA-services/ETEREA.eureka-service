@@ -217,37 +217,30 @@ jobs:
           
           cd wiki
           
-          # --- Home Page ---
+          # Create a simple Home.md as a portal
           cat > Home.md << EOF
-          # 📋 Eterea Eureka Service - Wiki del Proyecto
-          Bienvenido a la wiki del proyecto. Esta documentación se genera y actualiza automáticamente.
-          - [[Estado del Proyecto]]
-          - [[Pull Requests]]
-          ## 🎯 Milestones
-          EOF
-          jq -r '.[] | "- **[" + .title + "](" + .html_url + ")**"' ../milestones.json >> Home.md
+          # 📋 Wiki del Proyecto Eterea Eureka Service
 
-          # --- Project Status Page ---
-          cat > "Estado-del-Proyecto.md" << 'EOF'
-          # Estado del Proyecto
-          ## Resumen de Issues
-          EOF
-          echo "### Issues por Estado" >> "Estado-del-Proyecto.md"
-          echo "- **Total:** $(jq '. | length' ../issues.json)" >> "Estado-del-Proyecto.md"
-          echo "- **Abiertos:** $(jq '[.[] | select(.state=="open")] | length' ../issues.json)" >> "Estado-del-Proyecto.md"
-          echo "- **Cerrados:** $(jq '[.[] | select(.state=="closed")] | length' ../issues.json)" >> "Estado-del-Proyecto.md"
-          echo -e "\n### Issues por Etiqueta\n" >> "Estado-del-Proyecto.md"
-          jq -r '[.[] | .labels[] | {name: .name, color: .color}] | group_by(.name) | map({label: .[0].name, color: .[0].color, count: length}) | .[] | "- <span style=\"background-color: #" + .color + "; color: black; padding: 2px 5px; border-radius: 3px;\">" + .label + "</span>: **" + (.count | tostring) + "**"' ../issues.json >> "Estado-del-Proyecto.md" || echo "No hay etiquetas"
+          Esta wiki sirve como un portal de acceso rápido a los recursos más importantes del proyecto.
 
-          # --- Pull Requests Page ---
-          cat > Pull-Requests.md << 'EOF'
-          # Pull Requests
-          Listado de Pull Requests abiertos y cerrados.
+          Toda la **documentación detallada, interactiva y actualizada** se encuentra en nuestro sitio de **GitHub Pages**.
+
+          ## ➡️ [Acceder a la Documentación Principal](https://eterea.github.io/eureka-service/)
+
+          ---
+
+          ### Accesos Directos a GitHub
+
+          *   **[Issues](https://github.com/${{ github.repository }}/issues)**: Ver todos los issues, abiertos y cerrados.
+          *   **[Pull Requests](https://github.com/${{ github.repository }}/pulls)**: Ver todos los Pull Requests.
+          *   **[Milestones](https://github.com/${{ github.repository }}/milestones)**: Ver el progreso de los hitos del proyecto.
           EOF
-          jq -r '.[] | "### [#" + (.number|tostring) + " - " + .title + "](" + .html_url + ")\n- **Estado:** " + .state + "\n- **Autor:** " + .user.login + "\n"' ../prs.json >> Pull-Requests.md
+
+          # Clean up old, now-unused wiki pages
+          rm -f "Estado-del-Proyecto.md" "Pull-Requests.md"
 
           git add .
-          git commit -m "Update wiki documentation from PR #${{ github.event.pull_request.number || 'direct-push' }}" || echo "No changes to commit"
+          git commit -m "Update wiki to act as a portal to the main documentation" || echo "No changes to commit"
           
           if [[ "${{ github.event.pull_request.head.repo.full_name }}" == "${{ github.repository }}" ]] || [[ "${{ github.event_name }}" == "push" ]]; then
             git push --set-upstream https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.wiki.git master
