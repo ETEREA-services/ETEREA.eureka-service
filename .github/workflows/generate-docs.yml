@@ -31,6 +31,7 @@ jobs:
           echo "Fetching project information from GitHub API..."
           curl -s -H "Authorization: token $GITHUB_TOKEN" "https://api.github.com/repos/${{ github.repository }}/milestones" > milestones.json
           curl -s -H "Authorization: token $GITHUB_TOKEN" "https://api.github.com/repos/${{ github.repository }}/issues?state=all&per_page=100" > issues.json
+          curl -s -H "Authorization: token $GITHUB_TOKEN" "https://api.github.com/repos/${{ github.repository }}/pulls?state=all&per_page=100" > prs.json
           
           cat > docs/index.html << 'EOF'
           <!DOCTYPE html>
@@ -39,11 +40,14 @@ jobs:
               <meta charset="UTF-8">
               <meta name="viewport" content="width=device-width, initial-scale=1.0">
               <title>Eterea Eureka Service - Documentación del Proyecto</title>
+              <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
               <style>
                   body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; max-width: 1200px; margin: 0 auto; padding: 20px; background-color: #f5f5f5; }
+                  a { color: #667eea; text-decoration: none; }
+                  a:hover { text-decoration: underline; }
                   .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 2rem; border-radius: 10px; margin-bottom: 2rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-                  .milestone { background: white; padding: 1.5rem; margin-bottom: 1.5rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-                  .issue { background: #f8f9fa; padding: 1rem; margin: 0.5rem 0; border-left: 4px solid #667eea; border-radius: 4px; }
+                  .section { background: white; padding: 1.5rem; margin-bottom: 1.5rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+                  .item { background: #f8f9fa; padding: 1rem; margin: 0.5rem 0; border-left: 4px solid #667eea; border-radius: 4px; }
                   .label { display: inline-block; padding: 0.25rem 0.5rem; border-radius: 3px; font-size: 0.85rem; margin-right: 0.5rem; color: black; }
                   .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
                   .stat-card { background: white; padding: 1.5rem; border-radius: 8px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
@@ -59,7 +63,11 @@ jobs:
                   <p>Última actualización: <span id="update-date"></span></p>
               </div>
               <div id="stats" class="stats"></div>
-              <div id="milestones"></div>
+              <div id="architecture" class="section"></div>
+              <div id="milestones" class="section"></div>
+              <div id="pull-requests" class="section"></div>
+              
+              <script>mermaid.initialize({startOnLoad:true});</script>
               <script>
                   document.getElementById('update-date').textContent = new Date().toLocaleString('es-AR');
               </script>
@@ -70,16 +78,17 @@ jobs:
           cat > docs/data.js << EOF
           const milestonesData = $(cat milestones.json);
           const issuesData = $(cat issues.json);
+          const prsData = $(cat prs.json);
           EOF
           
           cat >> docs/index.html << 'EOF'
           <script src="data.js"></script>
           <script>
+              // --- Statistics ---
               const totalIssues = issuesData.length;
               const openIssues = issuesData.filter(i => i.state === 'open').length;
               const closedIssues = issuesData.filter(i => i.state === 'closed').length;
               const progress = totalIssues > 0 ? Math.round((closedIssues / totalIssues) * 100) : 0;
-          
               const statsHTML = `
                   <div class="stat-card"><div class="stat-number">${totalIssues}</div><div>Total Issues</div></div>
                   <div class="stat-card"><div class="stat-number">${openIssues}</div><div>Issues Abiertos</div></div>
@@ -87,24 +96,42 @@ jobs:
                   <div class="stat-card"><div class="stat-number">${progress}%</div><div>Progreso</div><div class="progress-bar" style="margin-top: 10px;"><div class="progress-fill" style="width: ${progress}%"></div></div></div>
               `;
               document.getElementById('stats').innerHTML = statsHTML;
+
+              // --- Architecture Diagram ---
+              const architectureHTML = `
+                  <h2>🏛️ Arquitectura del Servicio</h2>
+                  <div class="mermaid">
+                      graph TD
+                          subgraph Eterea Ecosystem
+                              A[API Gateway]
+                              B[Servicio de Autenticación]
+                              C[Servicio de Usuarios]
+                              D[Eterea Eureka Service]
+                          end
+                          A -- Descubre servicios en --> D
+                          B -- Se registra en --> D
+                          C -- Se registra en --> D
+                  </div>
+              `;
+              document.getElementById('architecture').innerHTML = architectureHTML;
           
-              let milestonesHTML = '';
+              // --- Milestones ---
+              let milestonesHTML = '<h2>🎯 Milestones</h2>';
               milestonesData.forEach(milestone => {
                   const milestoneIssues = issuesData.filter(i => i.milestone && i.milestone.id === milestone.id);
                   const openCount = milestoneIssues.filter(i => i.state === 'open').length;
                   const totalCount = milestoneIssues.length;
-          
                   milestonesHTML += `
-                      <div class="milestone">
-                          <h2>${milestone.title}</h2>
+                      <div class="section">
+                          <h3><a href="${milestone.html_url}" target="_blank">${milestone.title}</a></h3>
                           <p>${milestone.description || 'Sin descripción'}</p>
                           <p><strong>Fecha límite:</strong> ${milestone.due_on ? new Date(milestone.due_on).toLocaleDateString('es-AR') : 'No definida'}</p>
-                          <p><strong>Progreso:</strong> ${totalCount > 0 ? ((totalCount - openCount) / totalCount * 100) : 0}%</p>
+                          <p><strong>Progreso:</strong> ${totalCount - openCount} de ${totalCount} completados</p>
                           <div class="progress-bar"><div class="progress-fill" style="width: ${totalCount > 0 ? ((totalCount - openCount) / totalCount * 100) : 0}%"></div></div>
-                          <h3>Issues:</h3>
+                          <h4>Issues:</h4>
                           ${milestoneIssues.map(issue => `
-                              <div class="issue">
-                                  <strong>#${issue.number} - ${issue.title}</strong>
+                              <div class="item">
+                                  <strong><a href="${issue.html_url}" target="_blank">#${issue.number} - ${issue.title}</a></strong>
                                   ${issue.labels.map(label => `<span class="label" style="background-color: #${label.color};">${label.name}</span>`).join('')}
                                   <span style="float: right; color: ${issue.state === 'open' ? '#dc3545' : '#28a745'}">${issue.state === 'open' ? '🔴 Abierto' : '✅ Cerrado'}</span>
                               </div>
@@ -112,23 +139,20 @@ jobs:
                       </div>
                   `;
               });
-          
-              const noMilestoneIssues = issuesData.filter(i => !i.milestone);
-              if (noMilestoneIssues.length > 0) {
-                  milestonesHTML += `
-                      <div class="milestone">
-                          <h2>Issues sin Milestone</h2>
-                          ${noMilestoneIssues.map(issue => `
-                              <div class="issue">
-                                  <strong>#${issue.number} - ${issue.title}</strong>
-                                  ${issue.labels.map(label => `<span class="label" style="background-color: #${label.color};">${label.name}</span>`).join('')}
-                                  <span style="float: right; color: ${issue.state === 'open' ? '#dc3545' : '#28a745'}">${issue.state === 'open' ? '🔴 Abierto' : '✅ Cerrado'}</span>
-                              </div>
-                          `).join('')}
+              document.getElementById('milestones').innerHTML = milestonesHTML;
+
+              // --- Pull Requests ---
+              let prsHTML = '<h2>🔄 Pull Requests</h2>';
+              prsData.forEach(pr => {
+                  prsHTML += `
+                      <div class="item">
+                          <strong><a href="${pr.html_url}" target="_blank">#${pr.number} - ${pr.title}</a></strong>
+                          <p style="margin: 0; font-size: 0.9rem;">Creado por: ${pr.user.login}</p>
+                          <span style="float: right; color: ${pr.state === 'open' ? '#dc3545' : '#28a745'}">${pr.state === 'open' ? '🔴 Abierto' : '✅ Cerrado'}</span>
                       </div>
                   `;
-              }
-              document.getElementById('milestones').innerHTML = milestonesHTML;
+              });
+              document.getElementById('pull-requests').innerHTML = prsHTML;
           </script>
           EOF
 
@@ -150,29 +174,35 @@ jobs:
           
           cd wiki
           
-          cat > Home.md << 'EOF'
+          # --- Home Page ---
+          cat > Home.md << EOF
           # 📋 Eterea Eureka Service - Wiki del Proyecto
           Bienvenido a la wiki del proyecto. Esta documentación se genera y actualiza automáticamente.
-          ## 📊 Estado del Proyecto
-          Última actualización: $(date '+%Y-%m-%d %H:%M:%S')
+          - [[Estado del Proyecto]]
+          - [[Pull Requests]]
           ## 🎯 Milestones
           EOF
-          
-          jq -r '.[] | "### " + .title + "\n\n" + (.description // "Sin descripción") + "\n\n**Fecha límite:** " + (if .due_on then .due_on else "No definida" end) + "\n\n---\n"' ../milestones.json >> Home.md
-          
+          jq -r '.[] | "- **[" + .title + "](" + .html_url + ")**"' ../milestones.json >> Home.md
+
+          # --- Project Status Page ---
           cat > Project-Status.md << 'EOF'
           # Estado del Proyecto
           ## Resumen de Issues
           EOF
-          
           echo "### Issues por Estado" >> Project-Status.md
           echo "- **Total:** $(jq '. | length' ../issues.json)" >> Project-Status.md
           echo "- **Abiertos:** $(jq '[.[] | select(.state=="open")] | length' ../issues.json)" >> Project-Status.md
           echo "- **Cerrados:** $(jq '[.[] | select(.state=="closed")] | length' ../issues.json)" >> Project-Status.md
-          
           echo -e "\n### Issues por Etiqueta\n" >> Project-Status.md
           jq -r '[.[] | .labels[] | {name: .name, color: .color}] | group_by(.name) | map({label: .[0].name, color: .[0].color, count: length}) | .[] | "- <span style=\"background-color: #" + .color + "; color: black; padding: 2px 5px; border-radius: 3px;\">" + .label + "</span>: **" + (.count | tostring) + "**"' ../issues.json >> Project-Status.md || echo "No hay etiquetas"
-          
+
+          # --- Pull Requests Page ---
+          cat > Pull-Requests.md << 'EOF'
+          # Pull Requests
+          Listado de Pull Requests abiertos y cerrados.
+          EOF
+          jq -r '.[] | "### [#" + (.number|tostring) + " - " + .title + "](" + .html_url + ")\n- **Estado:** " + .state + "\n- **Autor:** " + .user.login + "\n"' ../prs.json >> Pull-Requests.md
+
           git add .
           git commit -m "Update wiki documentation from PR #${{ github.event.pull_request.number || 'direct-push' }}" || echo "No changes to commit"
           
