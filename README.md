@@ -55,10 +55,10 @@ docker run -p 8761:8761 eureka-service
 ```
 
 ## 📚 Documentación
+La documentación técnica y el estado del proyecto se generan automáticamente con cada cambio y se pueden consultar en:
 
-- [Documentación Técnica](https://eterea.github.io/eureka-service/)
+- [Documentación del Proyecto](https://eterea.github.io/eureka-service/)
 - [Wiki del Proyecto](https://github.com/eterea/eureka-service/wiki)
-- [Guía de API](https://eterea.github.io/eureka-service/api-documentation.html)
 
 ## 🛠️ Configuración
 
