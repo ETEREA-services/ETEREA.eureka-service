@@ -1,20 +1,31 @@
+# Site settings
 title: Eterea Eureka Service
-description: Servicio Eureka para el Registro y Descubrimiento de Servicios
-theme: jekyll-theme-cayman
+description: "Servicio Eureka para el Registro y Descubrimiento de Servicios en el ecosistema Eterea."
+theme: just-the-docs
 
-# Configuración importante para Jekyll
-defaults:
-  -
-    scope:
-      path: "" # aplica a todos los archivos
-    values:
-      layout: default
+url: "https://eterea-project.github.io/eterea.eureka-service" # the base hostname & protocol for your site, e.g. http://example.com
 
-# Especificar que los archivos .md deben ser procesados
-markdown: kramdown
-kramdown:
-  input: GFM
-  syntax_highlighter: rouge
+# Aux links for the header
+aux_links:
+  "Eterea Project on GitHub":
+    - "https://github.com/eterea-project/eterea.eureka-service"
 
-# Configurar la página principal
-index_page: index.md 
+# Enable search
+search_enabled: true
+
+# Navigation
+nav_items:
+  - title: "User Guide"
+    url: /getting-started
+    
+# Color scheme supports "light", "dark", "dark_high_contrast", "light_high_contrast", or custom
+color_scheme: dark
+
+# Set a path for the call to action button
+call_to_action:
+  button_text: "Get Started"
+  button_url: "/getting-started"
+  button_external: false
+
+# Footer content
+footer_content: "Copyright &copy; 2025 Eterea Project. All rights reserved."
