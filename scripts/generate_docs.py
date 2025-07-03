@@ -286,7 +286,7 @@ nav_order: 6
 All notable changes to this project will be documented in this file.
 
 {% for release in releases %}
-## [{{ release.tag_name }}] - {{ release.published_at | date:"%Y-%m-%d" }}
+## [{{ release.tag_name }}] - {{ release.published_at[:10] }}
 
 {{ release.body }}
 {% endfor %}
